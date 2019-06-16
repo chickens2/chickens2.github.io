@@ -1,0 +1,9 @@
+.selected {
+  box-shadow: 0 0 6pt 5pt hotpink;
+}
+.selectionBox{
+    transition: box-shadow 0.3s;
+    cursor: pointer;
+    position:absolute;
+    top:20px;
+}

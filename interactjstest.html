@@ -1,0 +1,43 @@
+<html>
+<head>
+    <style type = text/css>
+            .draggable {
+          touch-action: none;
+          user-select: none;
+          color:blue;
+        }
+        .containerthing{
+            background-color: coral;
+            width: 500px;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<script src="js/interact.js"></script>
+<div class="containerthing">
+    <div class="draggable"> Draggable Element </div>
+</div>
+<script>
+    const position = { x: 0, y: 0 }
+
+    interact('.draggable').draggable({
+      listeners: {
+        start (event) {
+            console.log('test')
+          console.log(event.type, event.target)
+        },
+        move (event) {
+          position.x += event.dx
+          position.y += event.dy
+
+          event.target.style.transform =
+            'translate('+position.x+'px,'+position.y+'px)'
+            //'transform(${position.x}, ${position.y})'
+        },
+      }
+    })
+
+</script>
+</body>
+</html>
