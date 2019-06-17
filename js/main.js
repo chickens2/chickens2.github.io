@@ -180,8 +180,9 @@
         if(window.localStorage.currentProject){
             loadProject(window.localStorage.currentProject)
         }
-        document.getElementById('codebar').style.width=datastore.codebarWidth
-        
+        if(datastore){
+            document.getElementById('codebar').style.width=datastore.codebarWidth
+        }
         //toggleCodebar(document.getElementById('codebar'))
             myCodeMirror = CodeMirror(document.getElementById('codebar'), {
             theme:'material',
@@ -297,7 +298,9 @@
                 y = (parseFloat(target.getAttribute('data-y')) || 0);
             // update the element's style
             target.style.width  = event.rect.width + 'px';
-            datastore.codebarWidth=event.rect.width
+            if(datastore){
+                datastore.codebarWidth=event.rect.width
+            }
             //setTimeout(myCodeMirror.refresh(),100)
           });
         var codeTemplateSelector=document.getElementById('templateSelector')
@@ -473,6 +476,9 @@
         
         //var file = new File([datastore], "data.json", {type: "text/plain;charset=utf-8"});
         //saveAs(JSON.stringify(datastore),"data.json");
+    }
+    function importjson(){
+        var json=prompt("Please paste JSON text here")
     }
     function setPastebinUrl(){
         console.log('setting pastebin url')
