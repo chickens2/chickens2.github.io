@@ -10,11 +10,13 @@
     function loadBrowser(){
         try{
             //datastore=JSON.parse(window.localStorage.CYOA);
-            loadProject(window.localStorage.currentProject)
+            if(window.localStorage.currentProject){
+                loadProject(window.localStorage.currentProject)
+            }
             //window.localStorage.currentProject=
             var link=document.getElementById('testcyoalink')
             link.setAttribute('href','./engine.html?p='+window.localStorage.currentProject);
-            if(typeof datastore=='object'){
+            if(datastore && typeof datastore=='object'){
                 load(datastore)
             }
         }
@@ -134,19 +136,24 @@
 
     function refreshUIVisibilities(){
         //ipfs=document.getElementsByClassName('imageinputform')
-        $('#scorebar').each(function(index){$(this).hide()});
-        $('.imageinputform').each(function(index){
-            $(this).hide()
-        });
-        $('#options').each(function(index){$(this).hide()});
-        for(let i=0;i<datastore.images.length+1;i++){
-            $('.imageinputform:eq('+i+')').each(function(){
-                $(this).show()
+        if(datastore){
+            $('#scorebar').each(function(index){$(this).hide()});
+            $('.imageinputform').each(function(index){
+                $(this).hide()
             });
+            $('#options').each(function(index){$(this).hide()});
+            for(let i=0;i<datastore.images.length+1;i++){
+                $('.imageinputform:eq('+i+')').each(function(){
+                    $(this).show()
+                });
+            }
+            if(datastore.images.length>0){
+                $('#options').each(function(index){$(this).show()});
+                $('#scorebar').each(function(index){$(this).show()});
+            }
         }
-        if(datastore.images.length>0){
-            $('#options').each(function(index){$(this).show()});
-            $('#scorebar').each(function(index){$(this).show()});
+        else{
+            console.log('could not refresh UI because datastore is null')
         }
     }
     function addImage(i){
@@ -439,6 +446,10 @@
       }
       datastore.codebarCollapsed=!datastore.codebarCollapsed
     }
+    function newProjectAndReload(){
+        newProject()
+        location.reload()
+    }
     function newProject(){
         var projectName=prompt("Project Name","")
         if(projectName){
@@ -448,14 +459,16 @@
             window.localStorage.currentProject=projectName
             var newProject={'images':[],'sharedcode':'','selections':[],'codebarCollapsed':false,'codebarWidth':300,'currentSelection':-2,'selectionCode':[],'selectionExecutionOrder':[]}
             window.localStorage['CYOA_'+projectName]=JSON.stringify(newProject)
+            return true
             //loadProject(projectName)
             //location.reload()
         }
+        return false
     }
     function loadProject(projectName){
         window.localStorage.currentProject=projectName
-        console.log('loading project??',projectName,JSON.parse(window.localStorage.CYOA))
         console.trace()
+        console.log('CYOA_'+projectName)
         datastore=JSON.parse(window.localStorage['CYOA_'+projectName])
         console.log('????',projectName,datastore)
     }
@@ -478,7 +491,14 @@
         //saveAs(JSON.stringify(datastore),"data.json");
     }
     function importjson(){
-        var json=prompt("Please paste JSON text here")
+        
+        var jsontext=prompt("Please paste JSON text here")
+        if(jsontext){
+            if(newProject()){
+                window.localStorage['CYOA_'+window.localStorage.currentProject]=jsontext
+                location.reload()
+            }
+        }
     }
     function setPastebinUrl(){
         console.log('setting pastebin url')

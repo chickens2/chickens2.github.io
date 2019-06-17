@@ -3,24 +3,29 @@ tempdata={}
 tagdata={}
 tagdatareverse={}
 declareTagsFlag=false
-function loadBrowser(){
+async function loadBrowser(){
         try{
             var projectName=getQueryVariable('p')
             if(projectName){
                 datastore=JSON.parse(window.localStorage['CYOA_'+projectName]);
-                if(typeof datastore=='object'){
-                    load(datastore)
-                }
             }
             else{
                 var pasteName=getQueryVariable('paste')
                 if(pasteName){
-                    
+                    var pasteDecoded=decodeURIComponent(pasteName)
+                    console.log('pastename is ',pasteName,pasteDecoded)
+                    await $.getJSON(pasteDecoded, function(result){
+                      console.log('got result from site',result)
+                      datastore=result
+                    });
                 }
                 else{
                     console.log('could not find url variables describing cyoa contents')
                 }
             }
+            if(datastore && typeof datastore=='object'){
+                    load(datastore)
+                }
         }
         catch(err){
             console.log('load error, try clearing browser cache ',window.localStorage.CYOA,err)
@@ -215,8 +220,8 @@ function resetSelected(){
         tempdata.selected.push(false)
     }
 }
-function init(){
-    loadBrowser()
+async function init(){
+    await loadBrowser()
     resetSelected()
     runAllSelectionsInitial()
     //runAllSelections()

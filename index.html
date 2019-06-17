@@ -28,17 +28,18 @@
       <div class="modal-content">
         <span class="modalclose">&times;</span>
         <h2>Publish To Web:</h2>
-        <p>First, host the following json text on <a href="https://pastebin.com/">https://pastebin.com/</a> or a similar text hosting site.</p>
+        <p>First, host the following json text on <a href="http://myjson.com/">http://myjson.com/</a> or a similar JSON hosting site (this text can also be used to 'import' your document on another computer/browser).</p>
         <button onclick='selectAllModal()'>Copy</button>
         <div id='modalcodebox'></div>
-        <p>Next, paste the resulting url here:</p>
+        <p>Next, paste the resulting (raw text) url here:</p>
         <input type="url" name="pastebinurl">
         <button onclick='setPastebinUrl()'>Generate Link</button>
         <br>
         Your CYOA: <a id='yourcyoalink' href=''></a>
         <br>
-        <h2>Download Zip:</h2>
+        <!--<h2>Download Zip:</h2>
         <button onclick='downloadSite()'>Download</button>
+        -->
       </div>
 
     </div>
@@ -130,7 +131,7 @@
             <br>
             <input type="checkbox" name="displayErrors" value="Bike"> alert on errors<br>
             <a href='./editall.html'>Edit All</a> 
-            <button class='priorityButton' id='publishButton' type="button" onclick="newProject()">New Project<span class='tooltiptext'>tool tip text</span></button> 
+            <button class='priorityButton' id='publishButton' type="button" onclick="newProjectAndReload()">New Project<span class='tooltiptext'>tool tip text</span></button> 
         </div>
         <div id="editorSpace">
             <img id="outimg1" class='outimg'>
