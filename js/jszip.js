@@ -1718,6 +1718,7 @@ var out = {
         return this.generateInternalStream(options).toNodejsStream(onUpdate);
     }
 };
+
 module.exports = out;
 
 },{"./compressedObject":2,"./defaults":5,"./generate":9,"./nodejs/NodejsStreamInputAdapter":12,"./nodejsUtils":14,"./stream/GenericWorker":28,"./stream/StreamHelper":29,"./utf8":31,"./utils":32,"./zipObject":35}],16:[function(require,module,exports){

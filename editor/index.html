@@ -1,0 +1,186 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/taggle.min.css">
+</head>
+<body>
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+<script src="../js/interact.js"></script>
+<script src="../js/scroll-sneak.js"></script>
+<link rel="stylesheet" href="../css/codemirror.css">
+<link rel="stylesheet" href="../css/material.css">
+<script src="../js/codemirror.js"></script>
+<script src="../mode/javascript/javascript.js"></script>
+<script src="../js/codemirrorJavascript.js"></script>
+<script src="../js/matchbrackets.js"></script>
+<script src="../js/taggle.js"></script>
+<script src="../js/templates.js"></script>
+<script src="../js/jszip.js"></script>
+<script src="../js/FileSaver.js"></script>
+
+<div id="editor">
+
+        <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="modalclose">&times;</span>
+        <h2>Publish To Web:</h2>
+        <p>First, host the following json text on <a href="http://myjson.com/">http://myjson.com/</a> or a similar JSON hosting site (this text can also be used to 'import' your document on another computer/browser).</p>
+        <button onclick='selectAllModal()'>Copy</button>
+        <div id='modalcodebox'></div>
+        <p>Next, paste the resulting (raw text) url here:</p>
+        <input type="url" name="pastebinurl">
+        <button onclick='setPastebinUrl()'>Generate Link</button>
+        <br>
+        Your CYOA: <a id='yourcyoalink' href=''></a>
+        <br>
+        <h2>Download As Standalone Website:</h2>
+        Download your project as a JSON file:
+        <button onclick='downloadSite()'>Download JSON as file</button>
+        Then copy it to the main directory of <a href='https://github.com/chickens2/chickens2.github.io/archive/master.zip'>this site</a>
+        <br>
+        Your CYOA is now a standalone website you can host yourself.
+      </div>
+
+    </div>
+
+    <div id="scorebar" class="selectionBox lvl3visibility" onclick="selectionClicked(this)"><div class='insideScorebar'> Scorebar: click to edit initialization code </div></div>
+
+    <div id="codebar" class="sidebar resize-drag3 lvl4visibility">
+        <div class="burger change" onclick="toggleCodebar(this)">
+          <div class="bar1"></div>
+          <div class="bar2"></div>
+          <div class="bar3"></div>
+        </div>
+        <div>
+            ID: <span id='selectionIDNumber'>#</span>
+            <br>
+            Execution order: <input type="number" name="execution_order" onchange="setExecutionOrder()">
+            <br>
+            Template: 
+            <select id="templateSelector">
+                <option value="-">-</option>
+            </select>
+
+        </div>
+        <br>
+    </div>
+    <!--<div class="sidebar" id="codebar">codecode</div>-->
+    <div id="editbar">
+        <div id="imagefields" class='lvl2visibility'>
+            <form class="imageinputform">
+            <a href="#outimg1">CYOA Image url:</a>
+                <input class="picField" type="url" name="addimg1" accept="image/*">
+                 <button type="button" onclick="addImage(0)">Add</button> 
+                 <button type="button" onclick="removeImage(0)">Rem</button> 
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg2">CYOA Image url:</a>
+                <input class="picField" type="url" name="addimg2" accept="image/*">
+            <button type="button" onclick="addImage(1)">Add</button>
+            <button type="button" onclick="removeImage(1)">Rem</button> 
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg3">CYOA Image url:</a>
+                <input class="picField" type="url" name="addimg3" accept="image/*">
+            <button type="button" onclick="addImage(2)">Add</button>
+            <button type="button" onclick="removeImage(2)">Rem</button> 
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg4">CYOA Image url:</a>
+                <input class="picField" type="url" name="addimg4" accept="image/*">
+            <button type="button" onclick="addImage(3)">Add</button>
+            <button type="button" onclick="removeImage(3)">Rem</button> 
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg5">CYOA Image url:</a>
+                <input  class="picField" type="url" name="addimg5" accept="image/*">
+            <button type="button" onclick="addImage(4)">Add</button>
+            <button type="button" onclick="removeImage(4)">Rem</button> 
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg6">CYOA Image url:</a>
+                <input  class="picField" type="url" name="addimg6" accept="image/*">
+            <button type="button" onclick="addImage(5)">Add</button>
+            <button type="button" onclick="removeImage(5)">Rem</button>
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg7">CYOA Image url:</a>
+                <input  class="picField" type="url" name="addimg7" accept="image/*">
+            <button type="button" onclick="addImage(6)">Add</button>
+            <button type="button" onclick="removeImage(6)">Rem</button>
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg8">CYOA Image url:</a>
+                <input  class="picField" type="url" name="addimg8" accept="image/*">
+            <button type="button" onclick="addImage(7)">Add</button>
+            <button type="button" onclick="removeImage(7)">Rem</button>
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg9">CYOA Image url:</a>
+                <input  class="picField" type="url" name="addimg9" accept="image/*">
+            <button type="button" onclick="addImage(8)">Add</button>
+            <button type="button" onclick="removeImage(8)">Rem</button>
+            </form>
+            <form class="imageinputform">
+            <a href="#outimg10">CYOA Image url:</a>
+                <input  class="picField" type="url" name="addimg10" accept="image/*">
+            <button type="button" onclick="addImage(9)">Add</button>
+            <button type="button" onclick="removeImage(9)">Rem</button>
+            </form>
+        </div>
+        <span id="options" class="optionsmenu">
+            <button class='priorityButton lvl5visibility' id='addSelectionButton' type="button" onclick="addSelection()"><img width=20 height=20 src='../img/greenplus.png'> Add Selection<span class='tooltiptext'>tool tip text</span></button> 
+        </span>
+        <span class="optionsmenu">
+            <a href='/' id='testcyoalink' class='lvl3visibility'>Preview CYOA</a>
+            <br>
+            <a href='/editall.html' class='lvl3visibility'>Edit All</a> 
+        </span>
+        <span class="optionsmenu">
+            <button class='normalButton lvl5visibility' id='publishButton' type="button" onclick="publish()">Publish/Export</button> 
+            <br>
+            <button class='normalButton lvl1visibility' id='importButton' type="button" onclick="importjson()">Import</button> 
+            <br>
+            
+            
+            <button class='normalButton' class='lvl1visibility' id='publishButton' type="button" onclick="newProjectAndReload()">New Project</button> 
+            
+        </span>
+        <span id="options2" class="optionsmenu lvl2visibility">
+            Projects:<br>
+            <select name="projectlist" size="7">
+            </select>
+        </span>
+        <span id="options3" class="optionsmenu lvl2visibility">
+            <span id='selectedProjectInfo'></span>
+            <br>
+            <button class='normalButton' id='publishButton' type="button" onclick="renameProject()">Rename Project</button>
+            <br>
+            <button class='normalButton' id='publishButton' type="button" onclick="deleteProject()">Delete Project</button>
+        </span>
+        </div>
+        <div id="editorSpace">
+            <img id="outimg1" class='outimg'>
+            <img id="outimg2" class='outimg'>
+            <img id="outimg3" class='outimg'>
+            <img id="outimg4" class='outimg'>
+            <img id="outimg5" class='outimg'>
+            <img id="outimg6" class='outimg'>
+            <img id="outimg7" class='outimg'>
+            <img id="outimg8" class='outimg'>
+            <img id="outimg9" class='outimg'>
+            <img id="outimg10" class='outimg'>
+        </div>
+    
+
+</div>
+</body>
+<script src="../js/main.js"></script>
+<script>
+    init()
+</script>
+</html>

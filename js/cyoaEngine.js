@@ -17,10 +17,20 @@ async function loadBrowser(){
                     await $.getJSON(pasteDecoded, function(result){
                       console.log('got result from site',result)
                       datastore=result
+                      var editlink=document.getElementById('editlink')
+                      editlink.href=window.location.host+'/editor?paste='+pasteName
+                      editlink.style='display:inline-block'
                     });
                 }
                 else{
-                    console.log('could not find url variables describing cyoa contents')
+                    console.log('could not find url variables describing cyoa contents, looking for server file')
+                    await $.getJSON("../CYOA.json", function(result) {
+                        console.log('got result from file'); 
+                        datastore=result
+                    })
+                    .fail(function(){
+                        console.log('request failed, cant find any CYOA to display')
+                    })
                 }
             }
             if(datastore && typeof datastore=='object'){

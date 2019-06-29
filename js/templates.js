@@ -16,7 +16,7 @@ return getSelectedTagCount('exampleTag') <= 1
 'Choose_N/Points':`//For options that are both limited in number and affect points
 declareTags('exampleTag')
 CYOA.points-= 5 
-return getSelectedTagCount('exampleTag') <= 1 && CYOA.points>0
+return getSelectedTagCount('exampleTag') <= 1
 `,
 'Prerequisite':`//For options that require another option to first be selected
 return getSelectedTagCount('exampleTag')>0
@@ -24,6 +24,14 @@ return getSelectedTagCount('exampleTag')>0
 'Prerequisite/Points':`//For options that require another option to first be selected
 CYOA.points-= 5 
 return getSelectedTagCount('exampleTag')>0
+`,
+'Welcome_Text':`/*
+Welcome to CYOA Interactivator! 
+
+This is the initialization code, which runs before all other calculations. This is where you set up initial values and variables, and determine what information will be shown to the user.
+
+Above this window is a 'Template' dropdown, which contains default code for various common CYOA selections. It is recommended that you select the 'Initialize' template now.
+*/
 `,
 'Initialize':`//Set custom CSS
 var styles = \`

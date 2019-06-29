@@ -1,12 +1,13 @@
 #editbar {
   overflow: hidden;
   background-color: rgba(0, 0, 0, 0.5);
-  position: fixed;
   top: 0;
   margin-left:0;
   padding-left:15;
   width: 100%;
   z-index:20;
+  position:fixed;
+  color:white;
 }
 #scorebar{
   overflow: hidden;
@@ -15,22 +16,31 @@
   bottom: 0;
   margin-left:0;
   padding-left:15;
+  height: 75px;
   width: 100%;
-  z-index:16;
+  z-index:91;
   color:white;
   font-size:20pt;
   font-family:'arial';
   font-weight:bold;
+
+}
+#codebar{
+    z-index: 92;
 }
 #editbar a{
     color:hotpink;
     display:inline-block;
     
 }
-#options{
+#selectedProjectInfo{
+    font-weight: bold;
+    font-size: large;
+}
+.optionsmenu{
     margin:10px;
     display:inline-block;
-    position:absolute;
+    vertical-align:top;
 }
 #imagefields{
     margin:10px;
@@ -44,6 +54,11 @@
 }
 #addSelectionButton{
     
+}
+.insideScorebar{
+    display:inline-block;
+    margin: 10px;
+    clear:left;
 }
 .sidebar {
   height: 100%;
@@ -79,11 +94,25 @@
   font-size: 36px;
   margin-left: 10px;
 }
+.normalButton{
+    background-color: #ffffcc;
+    border-color: transparent;
+    margin: 5px;
+    padding: .4em .8em;
+    font-size: .7em;
+    font-weight: 500;
+    border-width: 2px;
+    border-style: solid;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 4px;
+    cursor: pointer;
+}
 .priorityButton{
     background-color: rgb(255, 169, 70);
     border-color: transparent;
     padding: .4em .8em;
-    font-size: .9em;
+    font-size: 1.2em;
     font-weight: 700;
     border-width: 2px;
     border-style: solid;

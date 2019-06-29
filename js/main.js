@@ -7,17 +7,31 @@
         //window.localStorage.CYOA=JSON.stringify(datastore);
         window.localStorage['CYOA_'+window.localStorage.currentProject]=JSON.stringify(datastore);
     }
-    function loadBrowser(){
+    async function loadBrowser(){
         try{
-            //datastore=JSON.parse(window.localStorage.CYOA);
-            if(window.localStorage.currentProject){
-                loadProject(window.localStorage.currentProject)
+            var pasteName=getQueryVariable('paste')
+            console.log('loading browser ',pasteName)
+            if(pasteName){
+                var pasteDecoded=decodeURIComponent(pasteName)
+                console.log('pastename is ',pasteName,pasteDecoded)
+                await $.getJSON(pasteDecoded, function(result){
+                  console.log('got result from site',result)
+                  saveTempProject(JSON.stringify(result))
+                  //datastore=result
+                  //load(datastore)
+                });
             }
-            //window.localStorage.currentProject=
-            var link=document.getElementById('testcyoalink')
-            link.setAttribute('href','./engine.html?p='+window.localStorage.currentProject);
-            if(datastore && typeof datastore=='object'){
-                load(datastore)
+            else{
+                //datastore=JSON.parse(window.localStorage.CYOA);
+                if(window.localStorage.currentProject){
+                    loadProject(window.localStorage.currentProject)
+                }
+                //window.localStorage.currentProject=
+                var link=document.getElementById('testcyoalink')
+                link.setAttribute('href','/?p='+window.localStorage.currentProject);
+                if(datastore && typeof datastore=='object'){
+                    load(datastore)
+                }
             }
         }
         catch(err){
@@ -79,7 +93,7 @@
         if(selections.length>0 && selections[selections.length-1]){
             lastbox=selections[selections.length-1]
         }
-        var box=addSelectBox(selections.length,100,scrollHeight+100,lastbox.width,lastbox.height)
+        var box=addSelectBox(selections.length,100,scrollHeight+160,lastbox.width,lastbox.height)
         // $("#editorSpace").append("<div id=selectionBox"+selections.length+" class='resize-drag'>test</div>")
         // box=document.getElementById('selectionBox'+selections.length)
         // scrollHeight=document.documentElement.scrollTop || document.body.scrollTop
@@ -97,7 +111,7 @@
     function addSelectBox(i,x,y,w,h){
         console.log('addselectbox',i,x,y,w,h)
         $("#editorSpace").append("<div id=selectionBox"+i+" class='resize-drag selectionBox' onclick='selectionClicked(this)'></div>")
-        $('#selectionBox'+i).append("<img class='resize-drag2' src='img/drag.png' width=50px height=50px>")
+        $('#selectionBox'+i).append("<img class='resize-drag2' src='../img/drag.png' width=50px height=50px>")
         /*
         .close {
     float:right;
@@ -135,21 +149,31 @@
     }
 
     function refreshUIVisibilities(){
+        console.log('refreshuivisibilities')
         //ipfs=document.getElementsByClassName('imageinputform')
+        $('.lvl5visibility').each(function(index){$(this).hide()});
+        $('.lvl4visibility').each(function(index){$(this).hide()});
+        $('.lvl3visibility').each(function(index){$(this).hide()});
+        $('.lvl2visibility').each(function(index){$(this).hide()});
         if(datastore){
-            $('#scorebar').each(function(index){$(this).hide()});
-            $('.imageinputform').each(function(index){
-                $(this).hide()
-            });
-            $('#options').each(function(index){$(this).hide()});
+            //console.log('ruiv 2')
+            $('.lvl2visibility').each(function(index){$(this).show()});
             for(let i=0;i<datastore.images.length+1;i++){
                 $('.imageinputform:eq('+i+')').each(function(){
                     $(this).show()
                 });
             }
             if(datastore.images.length>0){
-                $('#options').each(function(index){$(this).show()});
-                $('#scorebar').each(function(index){$(this).show()});
+                //console.log('ruiv 3')
+                $('.lvl3visibility').each(function(index){$(this).show()});
+                if(!datastore.tutorialCodebarBlock){
+                    //console.log('ruiv 4')
+                    $('.lvl4visibility').each(function(index){$(this).show()});
+                    if(datastore.selectionCode[0].includes('CYOA[') || datastore.selectionCode[0].includes('CYOA.')){
+                        //console.log('ruiv 5')
+                        $('.lvl5visibility').each(function(index){$(this).show()});
+                    }
+                }
             }
         }
         else{
@@ -179,7 +203,7 @@
         datastore.selectionCode[datastore.currentSelection+1]=myCodeMirror.getValue()
         saveBrowser()
     }
-    function init(){
+    async function init(){
         console.log('main init')
         
         //set position of codebar BEFORE codemirror is initialized, as semi workaround for wrong-position cursor bug in codemirror.
@@ -339,15 +363,34 @@
             }
             saveCurrentCode()
             codeTemplateSelector.value='-'
+            refreshUIVisibilities()
         });
         document.getElementById('editorSpace').onkeydown=KeyPress
         for(var key in codeTemplates){
             $('#templateSelector').append('<option value="'+key+'">'+key+'</option>')
         }
-        loadBrowser()
+        await loadBrowser()
+        console.log('after loadbrowser')
         refreshUIVisibilities()
         var endposition=$('#outimg1').position()
         console.log('outimg1 after all other init',endposition)
+        var projectlist=document.getElementsByName('projectlist')[0]
+        if(window.localStorage.allProjects){
+            var allProjects=JSON.parse(window.localStorage.allProjects)
+            for(var key in allProjects){
+                var opt = document.createElement('option');
+                opt.appendChild( document.createTextNode(key) );
+                projectlist.appendChild(opt)
+            }
+        }
+        projectlist.value=window.localStorage.currentProject
+        projectlist.addEventListener('change',function(){
+            console.log('test ',projectlist.value)
+            window.localStorage.currentProject=projectlist.value
+            location.reload()
+        })
+        var selectedProjectInfo=document.getElementById('selectedProjectInfo')
+        selectedProjectInfo.textContent=window.localStorage.currentProject
     }
     function setExecutionOrder(){
         var eo=parseInt(document.getElementsByName('execution_order')[0].value)
@@ -361,6 +404,11 @@
         console.log('selection clicked',selection)
         var index=-2
         if(selection.id=='scorebar'){
+            if(datastore.tutorialCodebarBlock){
+                datastore.tutorialCodebarBlock=''
+                refreshUIVisibilities()
+                saveBrowser()
+            }
             index=-1
         }
         else{
@@ -391,15 +439,18 @@
                 if(oldSelectionId!=-2 && (oldSelection!=selection.id)){
                     document.getElementById(oldSelection).classList.remove("selected")
                 }
-                var code=datastore.selectionCode[index+1]
-                if(code){
-                    myCodeMirror.setValue(code)
-                }
-                else{
-                    myCodeMirror.setValue("")
-                }
-                myCodeMirror.focus()
+
             }
+            var code=datastore.selectionCode[index+1]
+            if(code){
+                myCodeMirror.setValue(code)
+            }
+            else{
+                myCodeMirror.setValue("")
+            }
+            myCodeMirror.focus()
+            
+            
             datastore.currentSelection=index;
             document.getElementsByName('execution_order')[0].value=datastore.selectionExecutionOrder[index]
             saveBrowser()
@@ -447,17 +498,19 @@
       datastore.codebarCollapsed=!datastore.codebarCollapsed
     }
     function newProjectAndReload(){
-        newProject()
-        location.reload()
+        if(newProject()){
+            location.reload()
+        }
     }
     function newProject(){
         var projectName=prompt("Project Name","")
         if(projectName){
-            if(!window.localStorage.CYOA){
-                window.localStorage.CYOA=JSON.stringify({})
-            }
+            //if(!window.localStorage.CYOA){
+            //    window.localStorage.CYOA=JSON.stringify({})
+            //}
             window.localStorage.currentProject=projectName
-            var newProject={'images':[],'sharedcode':'','selections':[],'codebarCollapsed':false,'codebarWidth':300,'currentSelection':-2,'selectionCode':[],'selectionExecutionOrder':[]}
+            addToAllProjects(projectName)
+            var newProject={'images':[],'sharedcode':'','selections':[],'codebarCollapsed':false,'codebarWidth':300,'currentSelection':-2,'selectionCode':[codeTemplates.Welcome_Text],'selectionExecutionOrder':[],'tutorialCodebarBlock':true}
             window.localStorage['CYOA_'+projectName]=JSON.stringify(newProject)
             return true
             //loadProject(projectName)
@@ -465,11 +518,40 @@
         }
         return false
     }
+    function deleteToAllProjects(oldName){
+        var allProjects=JSON.parse(window.localStorage.allProjects)
+        delete allProjects[oldName]
+        window.localStorage.allProjects=JSON.stringify(allProjects)
+        return allProjects
+    }
+    function replaceToAllProjects(oldName,newName){
+        var allProjects=JSON.parse(window.localStorage.allProjects)
+        delete allProjects[oldName]
+        allProjects[newName]=true
+        window.localStorage.allProjects=JSON.stringify(allProjects)
+    }
+    function addToAllProjects(projectName){
+        if(!window.localStorage.allProjects){
+            window.localStorage.allProjects='{}'
+        }
+        var allProjects=JSON.parse(window.localStorage.allProjects)
+        allProjects[projectName]=true
+        window.localStorage.allProjects=JSON.stringify(allProjects)
+    }
+    function saveTempProject(json){
+        window.localStorage.currentProject='TEMP'
+        addToAllProjects('TEMP')
+        window.localStorage['CYOA_TEMP']=json
+        window.location = window.location.href.split("?")[0];
+        //location.reload()
+    }
     function loadProject(projectName){
         window.localStorage.currentProject=projectName
         console.trace()
-        console.log('CYOA_'+projectName)
-        datastore=JSON.parse(window.localStorage['CYOA_'+projectName])
+        console.log('loading project CYOA_'+projectName)
+        if(window.localStorage['CYOA_'+projectName]){
+            datastore=JSON.parse(window.localStorage['CYOA_'+projectName])
+        }
         console.log('????',projectName,datastore)
     }
     function publish(){
@@ -491,7 +573,6 @@
         //saveAs(JSON.stringify(datastore),"data.json");
     }
     function importjson(){
-        
         var jsontext=prompt("Please paste JSON text here")
         if(jsontext){
             if(newProject()){
@@ -504,7 +585,7 @@
         console.log('setting pastebin url')
         var url=document.getElementsByName('pastebinurl')[0].value
         var linkElem=document.getElementById('yourcyoalink')
-        var cyoaurl=window.location.origin+'/engine.html?paste='+encodeURIComponent(url)
+        var cyoaurl=window.location.origin+'/?paste='+encodeURIComponent(url)
         linkElem.setAttribute("href",cyoaurl);
         linkElem.textContent=cyoaurl
     }
@@ -513,7 +594,42 @@
         myCodeMirrorModal.focus()
         document.execCommand('copy');
     }
-    
+    function getQueryVariable(variable)
+    {
+           var query = window.location.search.substring(1);
+           var vars = query.split("&");
+           for (var i=0;i<vars.length;i++) {
+                   var pair = vars[i].split("=");
+                   if(pair[0] == variable){return pair[1];}
+           }
+           return(false);
+    }
+    function renameProject(){
+        var newName=prompt("Rename "+window.localStorage.currentProject+" To:","")
+        if(newName){
+            var oldName=window.localStorage.currentProject
+            replaceToAllProjects(oldName,newName)
+            window.localStorage.currentProject=newName
+            window.localStorage['CYOA_'+newName]=JSON.stringify(datastore);
+            window.localStorage.removeItem('CYOA_'+oldName)
+            location.reload()
+        }
+    }
+    function deleteProject(){
+        var oldName=prompt("Are you sure you want to permanently delete project "+window.localStorage.currentProject+"?\nEnter its name to confirm:","")
+        if(oldName==window.localStorage.currentProject){
+            var allProjects=deleteToAllProjects(oldName)
+            window.localStorage.removeItem('CYOA_'+oldName)
+            if(allProjects && Object.keys(allProjects).length>0){
+                window.localStorage.currentProject=Object.keys(allProjects)[0]
+            }
+            location.reload()
+        }
+    }
+    function downloadSite(){
+        var blob = new Blob([JSON.stringify(datastore)], {type: "text/plain;charset=utf-8"});
+        saveAs(blob,"CYOA.json");
+    }
       // this is used later in the resizing and gesture demos
       window.dragMoveListener = dragMoveListener;
 
